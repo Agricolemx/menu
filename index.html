@@ -357,6 +357,203 @@
             transform: scale(1.01);
         }
 
+        /* SHARE BUTTON FLOTANTE */
+        .share-button {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 54px;
+            height: 54px;
+            background: linear-gradient(135deg, #c66726 0%, #d97f3a 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(198, 103, 38, 0.3);
+            z-index: 98;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: none;
+            opacity: 0;
+            transform: translateY(20px) scale(0.8);
+            animation: fadeInButton 0.6s ease forwards 0.5s;
+        }
+
+        @keyframes fadeInButton {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .share-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 24px rgba(198, 103, 38, 0.4);
+        }
+
+        .share-button img {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+        }
+
+        /* SHARE MODAL */
+        .share-modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+            opacity: 1;
+            transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+        }
+
+        .share-modal-backdrop.active {
+            display: flex;
+        }
+
+        .share-modal-backdrop.closing {
+            opacity: 0;
+            backdrop-filter: blur(0px);
+        }
+
+        .share-modal-content {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            transform: translateY(0);
+            opacity: 1;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .share-modal-backdrop.closing .share-modal-content {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+
+        .share-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #f5f5f5;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.5rem;
+            color: #666;
+        }
+
+        .share-modal-close:hover {
+            background: #c66726;
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .share-modal-title {
+            font-size: 1.5rem;
+            color: #c66726;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .share-modal-subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .share-qr-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            background: transparent;
+        }
+
+        .share-qr-container img {
+            width: 100%;
+            max-width: 350px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: -5px 5px 20px 4px rgba(0, 0, 0, 0.15);
+            background: #f1eadb;
+        }
+
+        @media (max-width: 768px) {
+            .share-button {
+                width: 50px;
+                height: 50px;
+                bottom: 90px;
+                right: 16px;
+            }
+
+            .share-button img {
+                width: 32px;
+                height: 32px;
+            }
+
+            .share-modal-content {
+                padding: 1.5rem;
+                max-width: 95%;
+            }
+
+            .share-modal-title {
+                font-size: 1.3rem;
+            }
+
+            .share-qr-container img {
+                max-width: 280px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .share-button {
+                width: 48px;
+                height: 48px;
+                bottom: 85px;
+                right: 12px;
+            }
+
+            .share-button img {
+                width: 30px;
+                height: 30px;
+            }
+
+            .share-modal-content {
+                padding: 1.2rem;
+            }
+
+            .share-modal-title {
+                font-size: 1.2rem;
+            }
+
+            .share-modal-subtitle {
+                font-size: 0.85rem;
+            }
+        }
+
         /* FOOTER ABATIBLE */
         .footer-backdrop {
             position: fixed;
@@ -1012,6 +1209,23 @@
         </div>
     </div>
 
+    <!-- SHARE BUTTON -->
+    <button class="share-button" onclick="openShareModal()" id="shareButton">
+        <img src="qr_code.png" alt="Share" style="width: 34px; height: 34px;">
+    </button>
+
+    <!-- SHARE MODAL -->
+    <div class="share-modal-backdrop" id="shareModalBackdrop" onclick="closeShareModalOnBackdrop(event)">
+        <div class="share-modal-content" onclick="event.stopPropagation()">
+            <button class="share-modal-close" onclick="closeShareModal()">&times;</button>
+            <h2 class="share-modal-title" id="shareModalTitle">Comparte nuestro menú</h2>
+            <p class="share-modal-subtitle" id="shareModalSubtitle">Escanea el código QR para ver el menú</p>
+            <div class="share-qr-container">
+                <img src="Scan_me_menu.png" alt="QR Code Menu" id="shareQRImage">
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL PRIVACIDAD -->
     <div id="privacyModal" class="modal" onclick="closeModalOnBackdrop(event, 'privacyModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
@@ -1118,6 +1332,8 @@
                 googleReviewLink: 'Déjanos una reseña en Google',
                 privacyTitle: 'Aviso de Privacidad',
                 termsTitle: 'Términos de uso',
+                shareModalTitle: 'Comparte nuestro menú',
+                shareModalSubtitle: 'Escanea el código QR para ver el menú',
                 menu1: 'menu_1_es.jpg',
                 menu2: 'menu_2_es.jpg'
             },
@@ -1142,6 +1358,8 @@
                 googleReviewLink: 'Leave us a Google review',
                 privacyTitle: 'Privacy Policy',
                 termsTitle: 'Terms of Use',
+                shareModalTitle: 'Share our menu',
+                shareModalSubtitle: 'Scan the QR code to view the menu',
                 menu1: 'menu_1_en.jpg',
                 menu2: 'menu_2_en.jpg'
             }
@@ -1165,6 +1383,10 @@
             document.getElementById('privacyLink').textContent = lang.privacyLink;
             document.getElementById('termsLink').textContent = lang.termsLink;
             document.getElementById('googleReviewLink').textContent = lang.googleReviewLink;
+            
+            // Update share modal
+            document.getElementById('shareModalTitle').textContent = lang.shareModalTitle;
+            document.getElementById('shareModalSubtitle').textContent = lang.shareModalSubtitle;
             
             // Load images with blur effect
             loadImageWithBlur('menu1', lang.menu1);
@@ -1441,6 +1663,48 @@
                 if (activeModal) {
                     closeModal(activeModal.id);
                 }
+                // Close share modal too
+                const shareModal = document.getElementById('shareModalBackdrop');
+                if (shareModal && shareModal.classList.contains('active')) {
+                    closeShareModal();
+                }
+            }
+        });
+
+        // SHARE MODAL FUNCTIONS
+        function openShareModal() {
+            const modal = document.getElementById('shareModalBackdrop');
+            modal.classList.remove('closing');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeShareModal() {
+            const modal = document.getElementById('shareModalBackdrop');
+            modal.classList.add('closing');
+            
+            setTimeout(function() {
+                modal.classList.remove('active');
+                modal.classList.remove('closing');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        function closeShareModalOnBackdrop(event) {
+            if (event.target.id === 'shareModalBackdrop') {
+                closeShareModal();
+            }
+        }
+
+        // Close share modal on scroll
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            const shareModal = document.getElementById('shareModalBackdrop');
+            if (shareModal && shareModal.classList.contains('active')) {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(function() {
+                    closeShareModal();
+                }, 100);
             }
         });
 
