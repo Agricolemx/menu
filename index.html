@@ -43,7 +43,14 @@
         .logo {
             width: 40px;
             height: auto;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, filter 0.6s ease, opacity 0.6s ease;
+            filter: blur(20px);
+            opacity: 0;
+        }
+
+        .logo.loaded {
+            filter: blur(0);
+            opacity: 1;
         }
 
         .logo:hover {
@@ -112,7 +119,14 @@
         .logo-center {
             width: 120px;
             height: auto;
+            filter: blur(20px);
             opacity: 0;
+            transition: filter 0.6s ease, opacity 0.6s ease;
+        }
+
+        .logo-center.loaded {
+            filter: blur(0);
+            opacity: 1;
             animation: slideUp 0.8s ease 0.2s forwards;
         }
 
@@ -269,6 +283,29 @@
             margin: 0 auto;
             max-width: 100%;
             transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            position: relative;
+        }
+
+        .menu-image-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            animation: shimmer 2s infinite;
+            z-index: 1;
+        }
+
+        .menu-image-container.loaded::before {
+            display: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .menu-image-container:hover {
@@ -281,8 +318,17 @@
             max-width: 900px;
             height: auto;
             display: block;
-            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.6s ease, opacity 0.6s ease;
             border-radius: 16px;
+            filter: blur(20px);
+            opacity: 0;
+            z-index: 2;
+            position: relative;
+        }
+
+        .menu-image-container img.loaded {
+            filter: blur(0);
+            opacity: 1;
         }
 
         .menu-image-container:hover img {
@@ -863,7 +909,7 @@
         <!-- HEADER -->
         <header>
             <div class="logo-container">
-                <img src="Agri_negro.png" alt="Agricole Logo" class="logo">
+                <img src="Agri_negro.png" alt="Agricole Logo" class="logo" id="headerLogo">
                 <span class="brand-name" id="headerTitle">Menú</span>
             </div>
             <div class="language-toggle">
@@ -874,7 +920,7 @@
 
         <!-- LANGUAGE SELECTION -->
         <section class="language-selection" id="languageSelection">
-            <img src="Agri_naranja.png" alt="Agricole" class="logo-center">
+            <img src="Agri_naranja.png" alt="Agricole" class="logo-center" id="centerLogo">
             <h1 id="selectLangTitle">Selecciona tu idioma</h1>
             <div class="language-buttons">
                 <button class="lang-option" onclick="selectLanguage('es')" id="esBtn">Español</button>
@@ -1099,10 +1145,34 @@
             document.getElementById('privacyLink').textContent = lang.privacyLink;
             document.getElementById('termsLink').textContent = lang.termsLink;
             document.getElementById('googleReviewLink').textContent = lang.googleReviewLink;
-            document.getElementById('menu1').src = lang.menu1;
-            document.getElementById('menu2').src = lang.menu2;
+            
+            // Load images with blur effect
+            loadImageWithBlur('menu1', lang.menu1);
+            loadImageWithBlur('menu2', lang.menu2);
+            
             document.getElementById('privacyModalTitle').textContent = lang.privacyTitle;
             document.getElementById('termsModalTitle').textContent = lang.termsTitle;
+        }
+
+        function loadImageWithBlur(elementId, src) {
+            const img = document.getElementById(elementId);
+            const container = img.parentElement;
+            
+            // Reset image state
+            img.classList.remove('loaded');
+            container.classList.remove('loaded');
+            
+            // Create a new image to preload
+            const tempImg = new Image();
+            tempImg.onload = function() {
+                img.src = src;
+                // Add loaded class after a small delay for smooth transition
+                setTimeout(() => {
+                    img.classList.add('loaded');
+                    container.classList.add('loaded');
+                }, 50);
+            };
+            tempImg.src = src;
         }
 
         function selectLanguage(lang) {
@@ -1133,6 +1203,28 @@
 
         // Initialize
         updateLanguage();
+
+        // Load all images with blur effect on page load
+        window.addEventListener('load', function() {
+            // Header logo
+            loadStaticImage('headerLogo', 'Agri_negro.png');
+            
+            // Center logo
+            loadStaticImage('centerLogo', 'Agri_naranja.png');
+        });
+
+        function loadStaticImage(elementId, src) {
+            const img = document.getElementById(elementId);
+            if (!img) return;
+            
+            const tempImg = new Image();
+            tempImg.onload = function() {
+                setTimeout(() => {
+                    img.classList.add('loaded');
+                }, 50);
+            };
+            tempImg.src = src;
+        }
 
         // FOOTER ABATIBLE
         function toggleFooter() {
@@ -1187,8 +1279,9 @@
             }
         });
 
-        // Cargar estado guardado del footer
+        // Cargar estado guardado del footer y cargar imágenes estáticas
         window.addEventListener('load', function() {
+            // Footer state
             const isOpen = localStorage.getItem('footerOpen') === 'true';
             const container = document.getElementById('footerContainer');
             const backdrop = document.getElementById('footerBackdrop');
@@ -1196,7 +1289,24 @@
                 container.classList.add('open');
                 backdrop.classList.add('active');
             }
+            
+            // Load static images with blur effect
+            loadStaticImage('headerLogo', 'Agri_negro.png');
+            loadStaticImage('centerLogo', 'Agri_naranja.png');
         });
+
+        function loadStaticImage(elementId, src) {
+            const img = document.getElementById(elementId);
+            if (!img) return;
+            
+            const tempImg = new Image();
+            tempImg.onload = function() {
+                setTimeout(() => {
+                    img.classList.add('loaded');
+                }, 50);
+            };
+            tempImg.src = src;
+        }
     </script>
 </body>
 </html>
