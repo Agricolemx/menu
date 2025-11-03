@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COCINA DE CAMPO BY AGRICOLE</title>
+    <link rel="icon" type="image/x-icon" href="agricole.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 2rem;
+            background-color: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            gap: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo {
+            width: 40px;
+            height: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .brand-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #c66726;
+            letter-spacing: -0.3px;
+        }
+
+        .language-toggle {
+            display: flex;
+            gap: 0.3rem;
+            background-color: #f8f8f8;
+            padding: 0.3rem 0.5rem;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            padding: 0.4rem 0.9rem;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .lang-btn.active {
+            background-color: #c66726;
+            color: white;
+            box-shadow: 0 2px 6px rgba(198, 103, 38, 0.25);
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* LANGUAGE SELECTION */
+        .language-selection {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            gap: 3rem;
+            opacity: 1;
+            animation: fadeIn 0.8s ease;
+            transition: opacity 0.5s ease;
+        }
+
+        .language-selection.hidden {
+            display: none;
+            opacity: 0;
+        }
+
+        .logo-center {
+            width: 120px;
+            height: auto;
+            opacity: 0;
+            animation: slideUp 0.8s ease 0.2s forwards;
+        }
+
+        .language-selection h1 {
+            font-size: 2.5rem;
+            color: #1a1a1a;
+            text-align: center;
+            opacity: 0;
+            animation: slideUp 0.8s ease 0.4s forwards;
+            font-weight: 300;
+            letter-spacing: -1px;
+            line-height: 1.3;
+        }
+
+        .language-buttons {
+            display: flex;
+            gap: 2rem;
+            opacity: 0;
+            animation: slideUp 0.8s ease 0.6s forwards;
+        }
+
+        .lang-option {
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+            border: 2px solid #c66726;
+            background-color: #ffffff;
+            color: #c66726;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.4s ease;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .lang-option:hover {
+            background-color: #c66726;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(198, 103, 38, 0.2);
+        }
+
+        /* LOADING SCREEN */
+        .loading-screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            gap: 2rem;
+            opacity: 0;
+        }
+
+        .loading-screen.active {
+            display: flex;
+            animation: fadeIn 0.8s ease;
+            opacity: 1;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #c66726;
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite;
+        }
+
+        .loading-text {
+            font-size: 1.3rem;
+            color: #666;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .loading-subtitle {
+            font-size: 0.95rem;
+            color: #999;
+            font-weight: 300;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-top: 1.5rem;
+            text-align: center;
+            padding: 0 2rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* MENU CONTENT */
+        .menu-content {
+            display: none;
+            flex-direction: column;
+            opacity: 0;
+        }
+
+        .menu-content.active {
+            display: flex;
+            animation: fadeIn 0.8s ease;
+            opacity: 1;
+        }
+
+        .about-section {
+            padding: 4rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #fafaf8 100%);
+        }
+
+        .about-section h2 {
+            font-size: 2rem;
+            color: #1a1a1a;
+            margin-bottom: 2rem;
+            font-weight: 300;
+            line-height: 1.4;
+            letter-spacing: -0.5px;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            color: #666;
+            line-height: 1.8;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+            letter-spacing: -0.3px;
+        }
+
+        .about-text strong {
+            color: #c66726;
+            font-weight: 500;
+        }
+
+        /* MENU IMAGES */
+        .menu-section {
+            padding: 3rem 2rem;
+            padding-bottom: 5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .menu-image-container {
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            padding: 1rem;
+            margin: 0 auto;
+            max-width: 100%;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .menu-image-container:hover {
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .menu-image-container img {
+            width: 100%;
+            max-width: 900px;
+            height: auto;
+            display: block;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-radius: 16px;
+        }
+
+        .menu-image-container:hover img {
+            transform: scale(1.015);
+        }
+
+        /* FOOTER ABATIBLE */
+        .footer-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(0px);
+            z-index: 99;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .footer-backdrop.active {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            pointer-events: auto;
+        }
+
+        .footer-container {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .footer-handle {
+            background: linear-gradient(135deg, #c66726 0%, #d97f3a 100%);
+            height: 24px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 -2px 12px rgba(198, 103, 38, 0.12);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .footer-handle::before {
+            content: '';
+            width: 36px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .footer-handle:hover {
+            box-shadow: 0 -4px 16px rgba(198, 103, 38, 0.2);
+        }
+
+        .footer-content-wrapper {
+            background: #ffffff;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        .footer-container.open .footer-content-wrapper {
+            max-height: calc(70vh - 24px);
+            overflow-y: auto;
+        }
+
+        .footer-inner {
+            padding: 1rem 2rem 1.2rem;
+        }
+
+        footer {
+            background-color: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-section h3 {
+            font-size: 0.8rem;
+            color: #c66726;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-section p {
+            font-size: 0.7rem;
+            color: #666;
+            margin: 0.25rem 0;
+            line-height: 1.4;
+        }
+
+        .footer-section a {
+            color: #c66726;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .footer-section a:hover {
+            color: #a85320;
+            text-decoration: underline;
+        }
+
+        .google-review-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            padding: 0.8rem 1rem;
+            background: linear-gradient(135deg, #c66726 0%, #d97f3a 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .google-review-link:hover {
+            background: linear-gradient(135deg, #d97f3a 0%, #e89548 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(198, 103, 38, 0.3);
+        }
+
+        /* MODALS */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            padding: 2rem;
+            padding-top: 4rem;
+            border-radius: 20px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            margin: 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        .modal-header {
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #c66726;
+            margin-left: -2rem;
+            margin-right: -2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            padding-top: 1rem;
+            margin-top: -4rem;
+        }
+
+        .modal-header h2 {
+            color: #c66726;
+            font-size: 1.5rem;
+            margin: 0;
+            padding-right: 3rem;
+        }
+
+        .modal-close {
+            background: #ffffff;
+            border: 2px solid #e0e0e0;
+            font-size: 1.8rem;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+        }
+
+        .modal-close:hover {
+            background: #c66726;
+            border-color: #c66726;
+            color: #ffffff;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 6px 16px rgba(198, 103, 38, 0.3);
+        }
+
+        .modal-body {
+            color: #666;
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .modal-body h3 {
+            color: #c66726;
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .modal-body p {
+            margin-bottom: 1rem;
+        }
+
+        .modal-body ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-body li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            header {
+                padding: 0.7rem 1.2rem;
+                gap: 0.8rem;
+            }
+
+            .logo {
+                width: 36px;
+            }
+
+            .brand-name {
+                font-size: 0.9rem;
+                letter-spacing: -0.2px;
+            }
+
+            .language-toggle {
+                padding: 0.25rem 0.4rem;
+            }
+
+            .lang-btn {
+                padding: 0.35rem 0.7rem;
+                font-size: 0.75rem;
+            }
+
+            .language-selection {
+                gap: 2rem;
+            }
+
+            .logo-center {
+                width: 90px;
+            }
+
+            .language-selection h1 {
+                font-size: 1.6rem;
+                margin: 0 1rem;
+            }
+
+            .language-buttons {
+                flex-direction: column;
+                gap: 1rem;
+                width: 100%;
+                padding: 0 1.2rem;
+            }
+
+            .lang-option {
+                min-width: unset;
+                padding: 1rem 2rem;
+                font-size: 1rem;
+                border-radius: 10px;
+            }
+
+            .loading-text {
+                font-size: 1.1rem;
+            }
+
+            .loading-subtitle {
+                font-size: 0.85rem;
+                max-width: 90%;
+                margin: 1rem auto 0;
+                padding: 0 1.5rem;
+            }
+
+            .about-section {
+                padding: 2rem 1.2rem;
+            }
+
+            .about-section h2 {
+                font-size: 1.4rem;
+                margin-bottom: 1.2rem;
+            }
+
+            .about-text {
+                font-size: 0.95rem;
+                line-height: 1.7;
+                max-width: 100%;
+            }
+
+            .menu-section {
+                padding: 1.5rem 1rem;
+                padding-bottom: 6rem;
+                gap: 2rem;
+                max-width: 100%;
+            }
+
+            .menu-image-container {
+                border-radius: 16px;
+                box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+                margin: 0 0.5rem;
+                padding: 0.6rem;
+            }
+
+            .menu-image-container:hover {
+                box-shadow: 0 10px 32px rgba(0, 0, 0, 0.12);
+            }
+
+            .menu-image-container img {
+                border-radius: 12px;
+            }
+
+            .footer-inner {
+                padding: 1.2rem 1.5rem 1.5rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1.2rem;
+            }
+
+            .footer-section h3 {
+                font-size: 0.8rem;
+            }
+
+            .footer-section p,
+            .footer-section a {
+                font-size: 0.7rem;
+            }
+
+            .google-review-link {
+                font-size: 0.85rem;
+                padding: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 0.6rem 1rem;
+            }
+
+            .logo {
+                width: 32px;
+            }
+
+            .brand-name {
+                font-size: 0.8rem;
+            }
+
+            .language-toggle {
+                padding: 0.2rem 0.4rem;
+            }
+
+            .lang-btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.7rem;
+            }
+
+            .logo-center {
+                width: 80px;
+            }
+
+            .language-selection h1 {
+                font-size: 1.4rem;
+                margin: 0 0.8rem;
+                line-height: 1.3;
+            }
+
+            .language-buttons {
+                gap: 0.8rem;
+                padding: 0 1rem;
+            }
+
+            .lang-option {
+                padding: 0.9rem 1.5rem;
+                font-size: 0.95rem;
+            }
+
+            .spinner {
+                width: 50px;
+                height: 50px;
+                border-width: 3px;
+            }
+
+            .loading-text {
+                font-size: 1rem;
+            }
+
+            .loading-subtitle {
+                font-size: 0.8rem;
+                line-height: 1.5;
+                max-width: 85%;
+                padding: 0 1.5rem;
+            }
+
+            .about-section {
+                padding: 1.5rem 1rem;
+            }
+
+            .about-section h2 {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+
+            .about-text {
+                font-size: 0.9rem;
+                line-height: 1.6;
+            }
+
+            .menu-section {
+                padding: 1.5rem 1rem;
+                padding-bottom: 7rem;
+                gap: 2rem;
+                max-width: 100%;
+            }
+
+            .menu-image-container {
+                border-radius: 14px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+                margin: 0 0.5rem;
+                padding: 0.5rem;
+            }
+
+            .menu-image-container:hover {
+                box-shadow: 0 8px 28px rgba(0, 0, 0, 0.11);
+            }
+
+            .menu-image-container img {
+                border-radius: 10px;
+            }
+
+            .footer-handle {
+                height: 28px;
+                border-radius: 14px 14px 0 0;
+            }
+
+            .footer-handle::before {
+                width: 34px;
+                height: 2px;
+            }
+
+            .footer-inner {
+                padding: 1rem 1.2rem 1.2rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .footer-section h3 {
+                font-size: 0.75rem;
+            }
+
+            .footer-section p,
+            .footer-section a {
+                font-size: 0.65rem;
+            }
+
+            .google-review-link {
+                font-size: 0.8rem;
+                padding: 0.8rem;
+                margin-top: 1rem;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+                padding-top: 4rem;
+                margin: 0.5rem;
+                max-height: 90vh;
+            }
+
+            .modal-header {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+                margin-left: -1.5rem;
+                margin-right: -1.5rem;
+                padding-top: 1rem;
+                margin-top: -4rem;
+            }
+
+            .modal-header h2 {
+                font-size: 1.2rem;
+                padding-right: 3rem;
+            }
+
+            .modal-close {
+                width: 40px;
+                height: 40px;
+                font-size: 1.6rem;
+                right: 1rem;
+                top: 1rem;
+            }
+
+            .modal-body {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <div class="logo-container">
+                <img src="agri_negro.png" alt="Agricole Logo" class="logo">
+                <span class="brand-name" id="headerTitle">Menú</span>
+            </div>
+            <div class="language-toggle">
+                <button class="lang-btn active" onclick="changeLanguage('es')">ES</button>
+                <button class="lang-btn" onclick="changeLanguage('en')">EN</button>
+            </div>
+        </header>
+
+        <!-- LANGUAGE SELECTION -->
+        <section class="language-selection" id="languageSelection">
+            <img src="agri_naranja.png" alt="Agricole" class="logo-center">
+            <h1 id="selectLangTitle">Selecciona tu idioma</h1>
+            <div class="language-buttons">
+                <button class="lang-option" onclick="selectLanguage('es')" id="esBtn">Español</button>
+                <button class="lang-option" onclick="selectLanguage('en')" id="enBtn">English</button>
+            </div>
+        </section>
+
+        <!-- LOADING SCREEN -->
+        <section class="loading-screen" id="loadingScreen">
+            <div class="spinner"></div>
+            <div>
+                <p class="loading-text" id="loadingText">Preparando el menú</p>
+                <p class="loading-subtitle" id="loadingSubtitle">Somos más que una tienda, somos un proyecto nacido de la pasión y el amor profundo que tenemos por nuestra tierra y nuestro compromiso con el vivir el momento de manera lenta y consciente, sin prisas.</p>
+            </div>
+        </section>
+
+        <!-- MENU CONTENT -->
+        <section class="menu-content" id="menuContent">
+            <!-- MENU IMAGES -->
+            <div class="menu-section">
+                <div class="menu-image-container">
+                    <img src="" id="menu1" alt="Menu 1">
+                </div>
+                <div class="menu-image-container">
+                    <img src="" id="menu2" alt="Menu 2">
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- FOOTER ABATIBLE -->
+    <div class="footer-backdrop" id="footerBackdrop" onclick="closeFooter()"></div>
+    <div class="footer-container" id="footerContainer">
+        <div class="footer-handle" onclick="toggleFooter()"></div>
+        <div class="footer-content-wrapper">
+            <div class="footer-inner">
+                <footer id="footer">
+                    <div class="footer-content">
+                        <div class="footer-grid">
+                            <div class="footer-section">
+                                <h3 id="footerAboutTitle">Sobre Agricole</h3>
+                                <p id="footerAbout">Cocina de Campo by Agricole</p>
+                                <p><a href="https://agricole.mx/" target="_blank" rel="noopener noreferrer">agricole.mx</a></p>
+                            </div>
+                            <div class="footer-section">
+                                <h3 id="footerLinkTitle">Enlaces</h3>
+                                <p><a href="#" onclick="openModal('privacyModal'); return false;" id="privacyLink">Aviso de Privacidad</a></p>
+                                <p><a href="#" onclick="openModal('termsModal'); return false;" id="termsLink">Términos de uso</a></p>
+                            </div>
+                            <div class="footer-section">
+                                <h3 id="footerContactTitle">Contacto</h3>
+                                <p id="footerAddress">
+                                    Carretera a Los Cabos KM 62<br>
+                                    El Pescadero B.C.S
+                                </p>
+                                <p>
+                                    <a href="mailto:info@agricole.com">info@agricole.com</a><br>
+                                    <a href="tel:+16121303130">(612) 130 3130</a>
+                                </p>
+                            </div>
+                        </div>
+
+                        <a href="https://share.google/2wcjvPkx16M8zi12W" target="_blank" class="google-review-link" id="googleReviewLink">
+                            Déjanos una reseña en Google
+                        </a>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PRIVACIDAD -->
+    <div id="privacyModal" class="modal" onclick="closeModalOnBackdrop(event, 'privacyModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal('privacyModal')">&times;</button>
+            <div class="modal-header">
+                <h2 id="privacyModalTitle">Aviso de Privacidad</h2>
+            </div>
+            <div class="modal-body">
+                <p>Este Aviso de Privacidad describe cómo se recopila, utiliza y protege la información personal que nos proporcionas al utilizar este sitio web. La privacidad y seguridad de tus datos personales es de suma importancia para nosotros, por lo que te recomendamos leer detenidamente esta declaración.</p>
+                
+                <h3>1. Información recopilada</h3>
+                <p>Cuando visitas nuestro sitio web, es posible que recopilemos cierta información personal y no personal de forma automática, como tu dirección IP, tipo de navegador, preferencias de idioma y otros datos estadísticos. Además, podemos solicitar información personal cuando interactúas con ciertas funciones o servicios de nuestro sitio web, como al suscribirte a nuestro boletín informativo, realizar una compra o enviar consultas a través de formularios de contacto.</p>
+                
+                <h3>2. Uso de la información</h3>
+                <p>Utilizamos la información recopilada para entender tus necesidades y brindarte un mejor servicio, y en particular para los siguientes propósitos:</p>
+                <ul>
+                    <li>Personalizar tu experiencia en el sitio web y presentarte contenido relevante.</li>
+                    <li>Procesar tus pedidos y proporcionarte la información, productos o servicios solicitados.</li>
+                    <li>Mejorar nuestros productos y servicios mediante el análisis de datos y la retroalimentación que nos proporcionas.</li>
+                    <li>Enviar correos electrónicos periódicos con respecto a tu solicitud o para enviarte información y promociones relacionadas con nuestros productos o servicios, siempre que hayas dado tu consentimiento expreso para recibir dichas comunicaciones.</li>
+                </ul>
+                
+                <h3>3. Divulgación de información</h3>
+                <p>No vendemos, intercambiamos ni transferimos de ninguna manera tu información personal a terceros sin tu consentimiento, excepto cuando sea necesario para cumplir con un requisito legal, hacer cumplir nuestras políticas o proteger nuestros derechos, propiedad o seguridad.</p>
+                
+                <h3>4. Seguridad de la información</h3>
+                <p>Implementamos medidas de seguridad razonables para proteger tu información personal contra accesos no autorizados, pérdida, uso indebido o divulgación. Sin embargo, debes tener en cuenta que ningún método de transmisión de datos a través de Internet o de almacenamiento electrónico es completamente seguro, por lo que no podemos garantizar su seguridad absoluta.</p>
+                
+                <h3>5. Enlaces a sitios web de terceros</h3>
+                <p>Nuestro sitio web puede contener enlaces a otros sitios web de terceros que pueden tener políticas de privacidad diferentes. No nos hacemos responsables por el contenido o las prácticas de privacidad de dichos sitios y te recomendamos leer sus políticas de privacidad antes de proporcionar cualquier información personal.</p>
+                
+                <h3>6. Cambios en el Aviso de Privacidad</h3>
+                <p>Nos reservamos el derecho de actualizar o modificar este Aviso de Privacidad en cualquier momento y sin previo aviso. Te recomendamos revisar periódicamente esta página para estar informado sobre cualquier cambio. El uso continuado de nuestro sitio web después de la publicación de los cambios constituye tu aceptación de dichos cambios.</p>
+                
+                <p>Si tienes alguna pregunta o inquietud sobre nuestro Aviso de Privacidad, no dudes en ponerte en contacto con nosotros a través de los canales de contacto proporcionados en el sitio web.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TÉRMINOS -->
+    <div id="termsModal" class="modal" onclick="closeModalOnBackdrop(event, 'termsModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal('termsModal')">&times;</button>
+            <div class="modal-header">
+                <h2 id="termsModalTitle">Términos de uso</h2>
+            </div>
+            <div class="modal-body">
+                <p>Bienvenido a nuestro sitio web. Los siguientes términos y condiciones rigen el uso de este sitio web. Al acceder a este sitio web, aceptas cumplir con estos términos y condiciones en su totalidad. Si no estás de acuerdo con alguno de estos términos y condiciones, te pedimos que no utilices nuestro sitio web.</p>
+                
+                <h3>1. Uso del sitio web</h3>
+                <ul>
+                    <li>El contenido de las páginas de este sitio web es para tu información general y uso. Está sujeto a cambios sin previo aviso.</li>
+                    <li>Ni nosotros ni terceros ofrecemos garantías en cuanto a la precisión, puntualidad, rendimiento, integridad o idoneidad de la información y los materiales encontrados u ofrecidos en este sitio web para cualquier propósito en particular. Aceptas que dicha información y materiales pueden contener inexactitudes o errores, y excluimos expresamente la responsabilidad por cualquier inexactitud o error en la máxima medida permitida por la ley.</li>
+                    <li>El uso de cualquier información o material en este sitio web es bajo tu propio riesgo, y no seremos responsables. Es tu responsabilidad asegurarte de que cualquier producto, servicio o información disponible a través de este sitio web cumpla con tus requisitos específicos.</li>
+                </ul>
+                
+                <h3>2. Propiedad intelectual</h3>
+                <ul>
+                    <li>Este sitio web contiene material que es propiedad nuestra o que tenemos licencia para usar. Este material incluye, pero no se limita a, el diseño, la presentación, la apariencia y los gráficos. La reproducción está prohibida salvo de acuerdo con el aviso de copyright, que forma parte de estos términos y condiciones.</li>
+                    <li>Todas las marcas registradas reproducidas en este sitio web que no son propiedad del operador están reconocidas en el sitio web.</li>
+                    <li>El uso no autorizado de este sitio web puede dar lugar a una reclamación por daños y/o ser considerado un delito.</li>
+                </ul>
+                
+                <h3>3. Enlaces a otros sitios web</h3>
+                <ul>
+                    <li>Este sitio web puede incluir enlaces a otros sitios web. Estos enlaces se proporcionan para tu conveniencia y para brindarte más información. No significa que respaldemos los sitios web enlazados. No tenemos responsabilidad por el contenido de los sitios web enlazados.</li>
+                    <li>Queda prohibido crear un enlace a este sitio web desde otro sitio web o documento sin nuestro previo consentimiento por escrito.</li>
+                </ul>
+                
+                <h3>4. Privacidad</h3>
+                <p>El uso de este sitio web está sujeto a nuestra política de privacidad, que forma parte de estos términos y condiciones.</p>
+                
+                <h3>5. Exclusión de responsabilidad</h3>
+                <p>Ni nosotros ni ningún tercero ofrece garantías en cuanto a la exactitud, puntualidad, rendimiento, integridad o idoneidad de la información y los materiales encontrados u ofrecidos en este sitio web para cualquier propósito en particular. Aceptas que dicha información y materiales pueden contener inexactitudes o errores, y excluimos expresamente la responsabilidad por cualquier inexactitud o error en la máxima medida permitida por la ley.</p>
+                
+                <h3>6. Ley aplicable</h3>
+                <p>El uso de este sitio web y cualquier disputa que surja de dicho uso están sujetos a las leyes del país o estado en el que se ubique el titular del sitio web.</p>
+                
+                <p>Estos términos y condiciones pueden cambiar ocasionalmente. Es tu responsabilidad verificar esta página regularmente para asegurarte de estar familiarizado con los términos y condiciones actuales.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            es: {
+                selectLangTitle: 'Selecciona tu idioma',
+                esBtn: 'Español',
+                enBtn: 'English',
+                loadingText: 'Preparando el menú',
+                loadingSubtitle: 'Somos más que una tienda, somos un proyecto nacido de la pasión y el amor profundo que tenemos por nuestra tierra y nuestro compromiso con vivir el momento de manera lenta y consciente, sin prisas.',
+                headerTitle: 'Menú',
+                footerAboutTitle: 'Sobre Agricole',
+                footerAbout: 'Cocina de Campo by Agricole',
+                footerLinkTitle: 'Enlaces',
+                privacyLink: 'Aviso de Privacidad',
+                termsLink: 'Términos de uso',
+                footerContactTitle: 'Contacto',
+                footerAddress: 'Carretera a Los Cabos KM 62<br>El Pescadero B.C.S',
+                reviewTitle: 'Déjanos tu opinión',
+                reviewPlaceholder: 'Comparte tu experiencia...',
+                clearBtn: 'Limpiar',
+                sendBtn: 'Enviar opinión',
+                googleReviewLink: 'Déjanos una reseña en Google',
+                privacyTitle: 'Aviso de Privacidad',
+                termsTitle: 'Términos de uso',
+                menu1: 'menu_1_es.jpg',
+                menu2: 'menu_2_es.jpg'
+            },
+            en: {
+                selectLangTitle: 'Select your language',
+                esBtn: 'Spanish',
+                enBtn: 'English',
+                loadingText: 'Preparing the menu',
+                loadingSubtitle: 'We are more than a store, we are a project born from passion and deep love for our land and our commitment to living the moment slowly and consciously, without haste.',
+                headerTitle: 'Menu',
+                footerAboutTitle: 'About Agricole',
+                footerAbout: 'Cocina de Campo by Agricole',
+                footerLinkTitle: 'Links',
+                privacyLink: 'Privacy Policy',
+                termsLink: 'Terms of Use',
+                footerContactTitle: 'Contact',
+                footerAddress: 'Highway to Los Cabos KM 62<br>El Pescadero B.C.S',
+                reviewTitle: 'Leave us your review',
+                reviewPlaceholder: 'Share your experience...',
+                clearBtn: 'Clear',
+                sendBtn: 'Send review',
+                googleReviewLink: 'Leave us a Google review',
+                privacyTitle: 'Privacy Policy',
+                termsTitle: 'Terms of Use',
+                menu1: 'menu_1_en.jpg',
+                menu2: 'menu_2_en.jpg'
+            }
+        };
+
+        let currentLanguage = 'es';
+
+        function updateLanguage() {
+            const lang = translations[currentLanguage];
+            document.getElementById('selectLangTitle').textContent = lang.selectLangTitle;
+            document.getElementById('esBtn').textContent = lang.esBtn;
+            document.getElementById('enBtn').textContent = lang.enBtn;
+            document.getElementById('loadingText').textContent = lang.loadingText;
+            document.getElementById('loadingSubtitle').textContent = lang.loadingSubtitle;
+            document.getElementById('headerTitle').textContent = lang.headerTitle;
+            document.getElementById('footerAboutTitle').textContent = lang.footerAboutTitle;
+            document.getElementById('footerAbout').textContent = lang.footerAbout;
+            document.getElementById('footerLinkTitle').textContent = lang.footerLinkTitle;
+            document.getElementById('footerContactTitle').textContent = lang.footerContactTitle;
+            document.getElementById('footerAddress').innerHTML = lang.footerAddress;
+            document.getElementById('privacyLink').textContent = lang.privacyLink;
+            document.getElementById('termsLink').textContent = lang.termsLink;
+            document.getElementById('googleReviewLink').textContent = lang.googleReviewLink;
+            document.getElementById('menu1').src = lang.menu1;
+            document.getElementById('menu2').src = lang.menu2;
+            document.getElementById('privacyModalTitle').textContent = lang.privacyTitle;
+            document.getElementById('termsModalTitle').textContent = lang.termsTitle;
+        }
+
+        function selectLanguage(lang) {
+            currentLanguage = lang;
+            updateLanguage();
+            
+            // Show loading screen
+            document.getElementById('languageSelection').classList.add('hidden');
+            document.getElementById('loadingScreen').classList.add('active');
+
+            // Simulate loading time and show menu
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.remove('active');
+                document.getElementById('menuContent').classList.add('active');
+            }, 3000);
+        }
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            updateLanguage();
+
+            // Update header buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Initialize
+        updateLanguage();
+
+        // FOOTER ABATIBLE
+        function toggleFooter() {
+            const container = document.getElementById('footerContainer');
+            const backdrop = document.getElementById('footerBackdrop');
+            const isOpen = container.classList.contains('open');
+            
+            if (isOpen) {
+                container.classList.remove('open');
+                backdrop.classList.remove('active');
+            } else {
+                container.classList.add('open');
+                backdrop.classList.add('active');
+            }
+            
+            // Guardar estado en localStorage
+            localStorage.setItem('footerOpen', !isOpen);
+        }
+
+        function closeFooter() {
+            const container = document.getElementById('footerContainer');
+            const backdrop = document.getElementById('footerBackdrop');
+            container.classList.remove('open');
+            backdrop.classList.remove('active');
+            localStorage.setItem('footerOpen', false);
+        }
+
+        // MODALS
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeModalOnBackdrop(event, modalId) {
+            if (event.target.classList.contains('modal')) {
+                closeModal(modalId);
+            }
+        }
+
+        // Cerrar modal con tecla ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const activeModal = document.querySelector('.modal.active');
+                if (activeModal) {
+                    closeModal(activeModal.id);
+                }
+            }
+        });
+
+        // Cargar estado guardado del footer
+        window.addEventListener('load', function() {
+            const isOpen = localStorage.getItem('footerOpen') === 'true';
+            const container = document.getElementById('footerContainer');
+            const backdrop = document.getElementById('footerBackdrop');
+            if (isOpen) {
+                container.classList.add('open');
+                backdrop.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
