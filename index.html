@@ -1183,25 +1183,59 @@
             container.classList.remove('loaded');
             container.classList.add('loading');
             
-            // Ultra-tiny placeholder - just a color (instant load)
-            const tinyPlaceholder = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3Crect fill="%23fafafa" width="1" height="1"/%3E%3C/svg%3E';
+            // Check cache first
+            const cacheKey = src;
+            const cachedDataUrl = getCachedImage(cacheKey);
             
-            // Set placeholder immediately
+            if (cachedDataUrl) {
+                // INSTANT LOAD from cache!
+                img.src = cachedDataUrl;
+                img.decoding = 'async';
+                
+                // Instant display - no blur needed
+                requestAnimationFrame(() => {
+                    img.classList.add('loaded');
+                    container.classList.remove('loading');
+                    container.classList.add('loaded');
+                });
+                return;
+            }
+            
+            // Not in cache - show placeholder
+            const tinyPlaceholder = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3Crect fill="%23fafafa" width="1" height="1"/%3E%3C/svg%3E';
             img.src = tinyPlaceholder;
             img.classList.add('placeholder');
             
-            // Preload full image with priority hint
+            // Load and cache image
             const fullImg = new Image();
-            fullImg.decoding = 'async'; // Async decoding for better performance
-            fullImg.loading = 'eager'; // Load immediately
+            fullImg.decoding = 'async';
+            fullImg.loading = 'eager';
             
-            // When full image is loaded
             fullImg.onload = function() {
-                // Replace with full image
-                img.src = src;
+                // Convert to data URL for caching
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = fullImg.width;
+                    canvas.height = fullImg.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(fullImg, 0, 0);
+                    
+                    // Get data URL with quality optimization
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    
+                    // Cache for next time
+                    setCachedImage(cacheKey, dataUrl);
+                    
+                    // Display image
+                    img.src = dataUrl;
+                } catch (e) {
+                    // If caching fails (CORS), just display normally
+                    console.warn('Could not cache image:', e);
+                    img.src = src;
+                }
+                
                 img.decoding = 'async';
                 
-                // Use requestAnimationFrame for smooth transition
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         img.classList.remove('placeholder');
@@ -1212,13 +1246,13 @@
                 });
             };
             
-            // Handle error
             fullImg.onerror = function() {
                 console.error('Error loading image:', src);
+                // Fallback to direct load
+                img.src = src;
                 container.classList.remove('loading');
             };
             
-            // Start loading full image
             fullImg.src = src;
         }
 
@@ -1251,25 +1285,109 @@
         // Initialize
         updateLanguage();
 
+        // CACHE SYSTEM - Store images in localStorage
+        const CACHE_PREFIX = 'agricole_img_';
+        const CACHE_VERSION = 'v1';
+        
+        function getCachedImage(key) {
+            try {
+                const cached = localStorage.getItem(CACHE_PREFIX + key);
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    if (data.version === CACHE_VERSION) {
+                        return data.dataUrl;
+                    }
+                }
+            } catch (e) {
+                console.warn('Cache read error:', e);
+            }
+            return null;
+        }
+        
+        function setCachedImage(key, dataUrl) {
+            try {
+                const data = {
+                    version: CACHE_VERSION,
+                    dataUrl: dataUrl,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(data));
+            } catch (e) {
+                console.warn('Cache write error (storage full?):', e);
+                // If storage is full, clear old caches
+                clearOldCaches();
+            }
+        }
+        
+        function clearOldCaches() {
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith(CACHE_PREFIX)) {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data.version !== CACHE_VERSION) {
+                            localStorage.removeItem(key);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Cache clear error:', e);
+            }
+        }
+
         // Load all images with blur effect on page load
         window.addEventListener('load', function() {
-            // Header logo
-            loadStaticImage('headerLogo', 'Agri_negro.png');
-            
-            // Center logo
-            loadStaticImage('centerLogo', 'Agri_naranja.png');
+            // Clear old version caches
+            clearOldCaches();
         });
 
         function loadStaticImage(elementId, src) {
             const img = document.getElementById(elementId);
             if (!img) return;
             
+            // Check cache first
+            const cacheKey = src;
+            const cachedDataUrl = getCachedImage(cacheKey);
+            
+            if (cachedDataUrl) {
+                // Instant load from cache
+                img.src = cachedDataUrl;
+                img.classList.add('loaded');
+                return;
+            }
+            
+            // Not cached - load and cache
             const tempImg = new Image();
+            
             tempImg.onload = function() {
+                // Try to cache the image
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = tempImg.width;
+                    canvas.height = tempImg.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(tempImg, 0, 0);
+                    const dataUrl = canvas.toDataURL('image/png', 0.9);
+                    
+                    setCachedImage(cacheKey, dataUrl);
+                    img.src = dataUrl;
+                } catch (e) {
+                    // If caching fails, just display normally
+                    console.warn('Could not cache logo:', e);
+                    img.src = src;
+                }
+                
                 setTimeout(() => {
                     img.classList.add('loaded');
                 }, 50);
             };
+            
+            tempImg.onerror = function() {
+                // Fallback to direct load
+                img.src = src;
+                img.classList.add('loaded');
+            };
+            
             tempImg.src = src;
         }
 
@@ -1337,23 +1455,10 @@
                 backdrop.classList.add('active');
             }
             
-            // Load static images with blur effect
+            // Load static images with cache
             loadStaticImage('headerLogo', 'Agri_negro.png');
             loadStaticImage('centerLogo', 'Agri_naranja.png');
         });
-
-        function loadStaticImage(elementId, src) {
-            const img = document.getElementById(elementId);
-            if (!img) return;
-            
-            const tempImg = new Image();
-            tempImg.onload = function() {
-                setTimeout(() => {
-                    img.classList.add('loaded');
-                }, 50);
-            };
-            tempImg.src = src;
-        }
     </script>
 </body>
 </html>
